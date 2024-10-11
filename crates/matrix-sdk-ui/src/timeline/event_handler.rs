@@ -282,12 +282,6 @@ pub(super) struct TimelineEventHandler<'a, 'o> {
     result: HandleEventResult,
 }
 
-
-fn timeline_item_is_send_sync() {
-    fn assert_send_sync<T: Send + Sync>() {}
-    assert_send_sync::<TimelineItem>();
-}
-
 impl<'a, 'o> TimelineEventHandler<'a, 'o> {
     pub(super) fn new(
         state: &'a mut TimelineStateTransaction<'o>,

@@ -24,7 +24,7 @@ use eyeball_im_util::vector::VectorObserverExt;
 use futures_util::{pin_mut, stream, Stream, StreamExt as _};
 use matrix_sdk::{
     executor::{spawn, JoinHandle},
-    Client, SlidingSync, SlidingSyncList,
+    Client, SlidingSync, SlidingSyncList, StoreError,
 };
 use matrix_sdk_base::RoomInfoNotableUpdate;
 use tokio::{
@@ -231,14 +231,13 @@ impl RoomList {
                 // Combine normal stream events with other updates from rooms
                 let merged_streams = merge_stream_and_receiver(raw_values.clone(), raw_stream, room_info_notable_update_receiver.resubscribe());
 
-                let (values, stream) = (raw_values, merged_streams);
-                    // TODO(daniel): DO NOT MERGE
-                    // .filter(filter_fn)
-                    // .sort_by(new_sorter_lexicographic(vec![
-                    //     Box::new(new_sorter_recency()),
-                    //     Box::new(new_sorter_name())
-                    // ]))
-                    // .dynamic_limit_with_initial_value(page_size, limit_stream.clone());
+                let (values, stream) = (raw_values, merged_streams)
+                    .filter(filter_fn)
+                    .sort_by(new_sorter_lexicographic(vec![
+                        Box::new(new_sorter_recency()),
+                        Box::new(new_sorter_name())
+                    ]))
+                    .dynamic_limit_with_initial_value(page_size, limit_stream.clone());
 
                 // Clearing the stream before chaining with the real stream.
                 yield stream::once(ready(vec![VectorDiff::Reset { values }]))

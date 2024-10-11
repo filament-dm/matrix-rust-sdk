@@ -119,7 +119,7 @@ impl PinnedEventsLoader {
     }
 }
 
-pub trait PinnedEventsRoom: SendOutsideWasm + SyncOutsideWasm {
+pub trait PinnedEventsRoom: Send + Sync {
     /// Load a single room event using the cache or network and any events
     /// related to it, if they are cached.
     ///

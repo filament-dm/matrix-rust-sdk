@@ -16,7 +16,7 @@ use std::{fmt::Formatter, sync::Arc};
 
 use futures_util::{stream, FutureExt as _, StreamExt};
 use matrix_sdk::{
-    config::RequestConfig, event_cache::paginator::PaginatorError, executor::BoxFuture, Room,
+    config::RequestConfig, event_cache::paginator::PaginatorError, executor::{BoxFuture, BoxFutureExt}, Room,
     SendOutsideWasm, SyncOutsideWasm,
 };
 use matrix_sdk_base::deserialized_responses::SyncTimelineEvent;
@@ -165,7 +165,7 @@ impl PinnedEventsRoom for Room {
                 .map(|e| (e.into(), Vec::new()))
                 .map_err(|err| PaginatorError::SdkError(Box::new(err)))
         }
-        .boxed()
+        .box_future()
     }
 
     fn pinned_event_ids(&self) -> Vec<OwnedEventId> {

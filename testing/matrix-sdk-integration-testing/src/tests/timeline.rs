@@ -170,7 +170,7 @@ async fn test_toggling_reaction() -> Result<()> {
             let event = assert_event_is_updated!(stream, event_id, message_position);
             let reactions = event.reactions().get(&reaction_key).unwrap();
             let reaction = reactions.get(&user_id).unwrap();
-            assert_matches!(reaction.status, ReactionStatus::LocalToRemote(..));
+            assert_matches!(reaction.status, ReactionStatus::LocalToRemote());
         }
 
         // Remote echo is added.

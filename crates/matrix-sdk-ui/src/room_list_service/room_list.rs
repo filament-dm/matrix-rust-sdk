@@ -14,6 +14,7 @@
 
 use std::{future::ready, sync::Arc};
 
+#[cfg(not(target_arch = "wasm32"))]
 use async_cell::sync::AsyncCell;
 use async_rx::StreamExt as _;
 use async_stream::stream;
@@ -37,6 +38,67 @@ use super::{
     sorters::{new_sorter_lexicographic, new_sorter_name, new_sorter_recency},
     Error, Room, State,
 };
+
+#[cfg(target_arch = "wasm32")]
+mod wasm32_async_cell {
+    use std::sync::Arc;
+    use std::rc::Rc;
+    use std::cell::RefCell;
+    use futures_util::{
+        Future,
+        task::{Context, Poll},
+        stream::{Stream,StreamExt, once},
+        future::ready,
+    };
+    use std::pin::Pin;
+    
+    pub struct AsyncCell<T> {
+        inner: Rc<RefCell<Option<T>>>,
+    }
+
+    impl<T> AsyncCell<T> {
+        pub fn new() -> Self {
+            Self {
+                inner: Rc::new(RefCell::new(None)),
+            }
+        }
+
+        pub fn shared() -> Arc<Self> {
+            Arc::new(Self::new())
+        }
+
+        pub fn set(&self, value: T) {
+            *self.inner.borrow_mut() = Some(value);
+        }
+
+        pub async fn take(&self) -> T {
+            AsyncCellFuture {
+                inner: self.inner.clone(),
+            }
+            .await
+        }
+    }
+
+    pub struct AsyncCellFuture<T> {
+        inner: Rc<RefCell<Option<T>>>,
+    }
+
+    impl<T> Future for AsyncCellFuture<T> {
+        type Output = T;
+
+        fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+            if let Some(value) = self.inner.borrow_mut().take() {
+                Poll::Ready(value)
+            } else {
+                cx.waker().wake_by_ref();
+                Poll::Pending
+            }
+        }
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+use wasm32_async_cell::{AsyncCell, AsyncCellFuture};
 
 /// A `RoomList` represents a list of rooms, from a
 /// [`RoomListService`](super::RoomListService).
@@ -169,13 +231,14 @@ impl RoomList {
                 // Combine normal stream events with other updates from rooms
                 let merged_streams = merge_stream_and_receiver(raw_values.clone(), raw_stream, room_info_notable_update_receiver.resubscribe());
 
-                let (values, stream) = (raw_values, merged_streams)
-                    .filter(filter_fn)
-                    .sort_by(new_sorter_lexicographic(vec![
-                        Box::new(new_sorter_recency()),
-                        Box::new(new_sorter_name())
-                    ]))
-                    .dynamic_limit_with_initial_value(page_size, limit_stream.clone());
+                let (values, stream) = (raw_values, merged_streams);
+                    // TODO(daniel): DO NOT MERGE
+                    // .filter(filter_fn)
+                    // .sort_by(new_sorter_lexicographic(vec![
+                    //     Box::new(new_sorter_recency()),
+                    //     Box::new(new_sorter_name())
+                    // ]))
+                    // .dynamic_limit_with_initial_value(page_size, limit_stream.clone());
 
                 // Clearing the stream before chaining with the real stream.
                 yield stream::once(ready(vec![VectorDiff::Reset { values }]))

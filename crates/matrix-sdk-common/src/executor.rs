@@ -20,7 +20,7 @@ use std::{
     task::{Context, Poll},
 };
 
-use futures_util::FutureExt as _;
+use futures_util::FutureExt;
 
 #[cfg(target_arch = "wasm32")]
 pub use futures_util::future::Aborted as JoinError;
@@ -151,8 +151,6 @@ impl<T> JoinHandleExt<T> for JoinHandle<T> {
         AbortOnDrop::new(self)
     }
 }
-
-
 #[cfg(test)]
 mod tests {
     use assert_matches::assert_matches;

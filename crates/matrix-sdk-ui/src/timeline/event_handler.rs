@@ -690,7 +690,7 @@ impl<'a, 'o> TimelineEventHandler<'a, 'o> {
                     timestamp: self.ctx.timestamp,
                     status: match &reaction_id {
                         TimelineEventItemId::TransactionId(_txn_id) => {
-                            ReactionStatus::LocalToRemote(send_handle)
+                            ReactionStatus::LocalToRemote()
                         }
                         TimelineEventItemId::EventId(event_id) => {
                             ReactionStatus::RemoteToRemote(event_id.clone())
@@ -1009,7 +1009,7 @@ impl<'a, 'o> TimelineEventHandler<'a, 'o> {
             Flow::Local { txn_id, send_handle } => LocalEventTimelineItem {
                 send_state: EventSendState::NotSentYet,
                 transaction_id: txn_id.to_owned(),
-                send_handle: send_handle.clone(),
+                // send_handle: send_handle.clone(),
             }
             .into(),
 

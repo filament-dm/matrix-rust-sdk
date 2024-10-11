@@ -499,8 +499,8 @@ impl Timeline {
                 if let Some(item) = self.item_by_transaction_id(&txn_id).await {
                     match item.handle() {
                         TimelineItemHandle::Remote(event_id) => event_id.to_owned(),
-                        /// TODO(daniel): removed temporarily
-                        // TimelineItemHandle::Local(handle) => {
+                        // TODO(daniel): removed temporarily
+                        // TimelineItemHandle::Local() => {
                         TimelineItemHandle::Local() => {
                             // Relations are filled by the editing code itself.
                             let new_content: AnyMessageLikeEventContent = match new_content {
@@ -526,7 +526,7 @@ impl Timeline {
                                 }
                             };
                             return Ok(false);
-                            /// TODO(daniel): removed temporarily
+                            // TODO(daniel): removed temporarily
                             // return Ok(handle
                             //     .edit(new_content)
                             //     .await
@@ -610,9 +610,9 @@ impl Timeline {
                 };
 
                 match item.handle() {
-                    TimelineItemHandle::Local(handle) => {
+                    TimelineItemHandle::Local() => {
                         // If there is a local item that hasn't been sent yet, abort the upload
-                        handle.abort().await.map_err(RoomSendQueueError::StorageError)?;
+                        // handle.abort().await.map_err(RoomSendQueueError::StorageError)?;
                         return Ok(());
                     }
                     TimelineItemHandle::Remote(event_id) => event_id.to_owned(),
@@ -649,7 +649,7 @@ impl Timeline {
                     TimelineItemHandle::Remote(event_id) => event_id.to_owned(),
                     TimelineItemHandle::Local() => {
                         return Ok(false);
-                        /// TODO(daniel): removed temporarily
+                        // TODO(daniel): removed temporarily
                         // return Ok(handle
                         //     .abort()
                         //     .await

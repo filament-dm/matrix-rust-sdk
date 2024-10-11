@@ -499,7 +499,9 @@ impl Timeline {
                 if let Some(item) = self.item_by_transaction_id(&txn_id).await {
                     match item.handle() {
                         TimelineItemHandle::Remote(event_id) => event_id.to_owned(),
-                        TimelineItemHandle::Local(handle) => {
+                        /// TODO(daniel): removed temporarily
+                        // TimelineItemHandle::Local(handle) => {
+                        TimelineItemHandle::Local() => {
                             // Relations are filled by the editing code itself.
                             let new_content: AnyMessageLikeEventContent = match new_content {
                                 EditedContent::RoomMessage(message) => {
@@ -523,10 +525,12 @@ impl Timeline {
                                     }
                                 }
                             };
-                            return Ok(handle
-                                .edit(new_content)
-                                .await
-                                .map_err(RoomSendQueueError::StorageError)?);
+                            return Ok(false);
+                            /// TODO(daniel): removed temporarily
+                            // return Ok(handle
+                            //     .edit(new_content)
+                            //     .await
+                            //     .map_err(RoomSendQueueError::StorageError)?);
                         }
                     }
                 } else {
@@ -643,11 +647,13 @@ impl Timeline {
                 // See if we have an up-to-date timeline item with that transaction id.
                 match event.handle() {
                     TimelineItemHandle::Remote(event_id) => event_id.to_owned(),
-                    TimelineItemHandle::Local(handle) => {
-                        return Ok(handle
-                            .abort()
-                            .await
-                            .map_err(RoomSendQueueError::StorageError)?);
+                    TimelineItemHandle::Local() => {
+                        return Ok(false);
+                        /// TODO(daniel): removed temporarily
+                        // return Ok(handle
+                        //     .abort()
+                        //     .await
+                        //     .map_err(RoomSendQueueError::StorageError)?);
                     }
                 }
             }

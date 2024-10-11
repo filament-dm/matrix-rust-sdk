@@ -31,6 +31,7 @@ use std::{
 use mas_oidc_client::types::registration::{
     ClientMetadata, ClientMetadataVerificationError, VerifiedClientMetadata,
 };
+use matrix_sdk_common::BackendError;
 use serde::{Deserialize, Serialize};
 use url::Url;
 
@@ -42,7 +43,7 @@ pub enum OidcRegistrationsError {
     InvalidFilePath,
     /// An error occurred whilst saving the registration data.
     #[error("Failed to save the registration data {0}.")]
-    SaveFailure(#[source] Box<dyn std::error::Error + Send + Sync>),
+    SaveFailure(#[source] BackendError),
 }
 
 /// A client ID that has been registered with an OpenID Connect provider.

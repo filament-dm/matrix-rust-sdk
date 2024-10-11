@@ -20,7 +20,8 @@ use indexmap::IndexMap;
 #[cfg(test)]
 use matrix_sdk::crypto::{DecryptionSettings, TrustRequirement};
 use matrix_sdk::{
-    deserialized_responses::TimelineEvent, event_cache::paginator::PaginableRoom, BoxFuture,
+    deserialized_responses::TimelineEvent, event_cache::paginator::PaginableRoom,
+    executor::{BoxFuture, BoxFutureExt as _},
     Result, Room,
 };
 use matrix_sdk_base::{latest_event::LatestEvent, RoomInfo};
@@ -137,7 +138,7 @@ impl RoomDataProvider for Room {
                 }
             }
         }
-        .boxed()
+        .box_future()
     }
 
     fn profile_from_latest_event(&self, latest_event: &LatestEvent) -> Option<Profile> {
@@ -172,7 +173,7 @@ impl RoomDataProvider for Room {
                 }
             }
         }
-        .boxed()
+        .box_future()
     }
 
     fn load_event_receipts<'a>(
@@ -205,7 +206,7 @@ impl RoomDataProvider for Room {
             unthreaded_receipts.extend(main_thread_receipts);
             unthreaded_receipts
         }
-        .boxed()
+        .box_future()
     }
 
     fn push_rules_and_context(&self) -> BoxFuture<'_, Option<(Ruleset, PushConditionRoomCtx)>> {
@@ -228,7 +229,7 @@ impl RoomDataProvider for Room {
                 }
             }
         }
-        .boxed()
+        .box_future()
     }
 
     fn load_fully_read_marker(&self) -> BoxFuture<'_, Option<OwnedEventId>> {
@@ -248,7 +249,7 @@ impl RoomDataProvider for Room {
                 _ => None,
             }
         }
-        .boxed()
+        .box_future()
     }
 
     fn send(&self, content: AnyMessageLikeEventContent) -> BoxFuture<'_, Result<(), super::Error>> {
@@ -256,7 +257,7 @@ impl RoomDataProvider for Room {
             let _ = self.send_queue().send(content).await?;
             Ok(())
         }
-        .boxed()
+        .box_future()
     }
 
     fn redact<'a>(
@@ -273,7 +274,7 @@ impl RoomDataProvider for Room {
                 .map_err(super::Error::RedactError)?;
             Ok(())
         }
-        .boxed()
+        .box_future()
     }
 
     fn room_info(&self) -> Subscriber<RoomInfo> {

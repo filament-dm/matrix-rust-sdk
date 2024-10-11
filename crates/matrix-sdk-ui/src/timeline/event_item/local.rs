@@ -28,8 +28,9 @@ pub(in crate::timeline) struct LocalEventTimelineItem {
     pub send_state: EventSendState,
     /// The transaction ID.
     pub transaction_id: OwnedTransactionId,
+    /// TODO(daniel): removed temporarily
     /// A handle to manipulate this event before it is sent, if possible.
-    pub send_handle: Option<SendHandle>,
+    //pub send_handle: Option<SendHandle>,
 }
 
 impl LocalEventTimelineItem {

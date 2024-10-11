@@ -60,10 +60,9 @@ use tokio::sync::{broadcast, Mutex, RwLock};
 use tracing::warn;
 
 use crate::{
-    event_cache_store::{DynEventCacheStore, IntoEventCacheStore},
-    rooms::{normal::RoomInfoNotableUpdate, RoomInfo, RoomState},
-    MinimalRoomMemberEvent, Room, RoomStateFilter, SessionMeta,
+    event_cache_store::{DynEventCacheStore, IntoEventCacheStore}, rooms::{normal::RoomInfoNotableUpdate, RoomInfo, RoomState}, MinimalRoomMemberEvent, Room, RoomStateFilter, SessionMeta
 };
+use matrix_sdk_common::BackendError;
 
 pub(crate) mod ambiguity_map;
 mod memory_store;
@@ -86,7 +85,7 @@ pub use self::{
 pub enum StoreError {
     /// An error happened in the underlying database backend.
     #[error(transparent)]
-    Backend(Box<dyn std::error::Error + Send + Sync>),
+    Backend(BackendError),
     /// An error happened while serializing or deserializing some data.
     #[error(transparent)]
     Json(#[from] serde_json::Error),

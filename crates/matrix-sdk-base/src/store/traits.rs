@@ -50,9 +50,8 @@ use crate::{
 
 /// An abstract state store trait that can be used to implement different stores
 /// for the SDK.
-#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
-#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
-pub trait StateStore: AsyncTraitDeps {
+#[async_trait]
+pub trait StateStore: fmt::Debug + Send + Sync {
     /// The error type used by this state store.
     type Error: fmt::Debug + Into<StoreError> + From<serde_json::Error>;
 
@@ -452,8 +451,7 @@ impl<T: fmt::Debug> fmt::Debug for EraseStateStoreError<T> {
     }
 }
 
-#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
-#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
+#[async_trait]
 impl<T: StateStore> StateStore for EraseStateStoreError<T> {
     type Error = StoreError;
 

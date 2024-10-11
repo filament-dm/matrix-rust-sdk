@@ -31,6 +31,7 @@ wiremock = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2.6", default-features = false, features = ["js"] }
+tokio = { workspace = true, default-features = false, features = ["rt", "macros"] }
 wasm-bindgen-test = "0.3.33"
 
 [lints]

@@ -14,6 +14,7 @@
 
 use std::{future::ready, sync::Arc};
 
+#[cfg(not(target_arch = "wasm32"))]
 use async_cell::sync::AsyncCell;
 use async_rx::StreamExt as _;
 use async_stream::stream;
@@ -23,7 +24,7 @@ use eyeball_im_util::vector::VectorObserverExt;
 use futures_util::{pin_mut, stream, Stream, StreamExt as _};
 use matrix_sdk::{
     executor::{spawn, JoinHandle},
-    Client, SlidingSync, SlidingSyncList,
+    Client, SlidingSync, SlidingSyncList, StoreError,
 };
 use matrix_sdk_base::RoomInfoNotableUpdate;
 use tokio::{
@@ -37,6 +38,67 @@ use super::{
     sorters::{new_sorter_lexicographic, new_sorter_name, new_sorter_recency},
     Error, Room, State,
 };
+
+#[cfg(target_arch = "wasm32")]
+mod wasm32_async_cell {
+    use std::sync::Arc;
+    use std::rc::Rc;
+    use std::cell::RefCell;
+    use futures_util::{
+        Future,
+        task::{Context, Poll},
+        stream::{Stream,StreamExt, once},
+        future::ready,
+    };
+    use std::pin::Pin;
+    
+    pub struct AsyncCell<T> {
+        inner: Rc<RefCell<Option<T>>>,
+    }
+
+    impl<T> AsyncCell<T> {
+        pub fn new() -> Self {
+            Self {
+                inner: Rc::new(RefCell::new(None)),
+            }
+        }
+
+        pub fn shared() -> Arc<Self> {
+            Arc::new(Self::new())
+        }
+
+        pub fn set(&self, value: T) {
+            *self.inner.borrow_mut() = Some(value);
+        }
+
+        pub async fn take(&self) -> T {
+            AsyncCellFuture {
+                inner: self.inner.clone(),
+            }
+            .await
+        }
+    }
+
+    pub struct AsyncCellFuture<T> {
+        inner: Rc<RefCell<Option<T>>>,
+    }
+
+    impl<T> Future for AsyncCellFuture<T> {
+        type Output = T;
+
+        fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+            if let Some(value) = self.inner.borrow_mut().take() {
+                Poll::Ready(value)
+            } else {
+                cx.waker().wake_by_ref();
+                Poll::Pending
+            }
+        }
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+use wasm32_async_cell::{AsyncCell, AsyncCellFuture};
 
 /// A `RoomList` represents a list of rooms, from a
 /// [`RoomListService`](super::RoomListService).

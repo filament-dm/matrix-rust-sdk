@@ -504,20 +504,21 @@ impl<P: RoomDataProvider> TimelineController<P> {
         let Some(prev_status) = prev_status else {
             match &item.inner.kind {
                 EventTimelineItemKind::Local(local) => {
-                    if let Some(send_handle) = local.send_handle.clone() {
-                        if send_handle
-                            .react(key.to_owned())
-                            .await
-                            .map_err(|err| Error::SendQueueError(err.into()))?
-                            .is_some()
-                        {
-                            trace!("adding a reaction to a local echo");
-                            return Ok(true);
-                        }
+                    // TODO(daniel): removed temporarily
+                    // if let Some(send_handle) = local.send_handle.clone() {
+                    //     if send_handle
+                    //         .react(key.to_owned())
+                    //         .await
+                    //         .map_err(|err| Error::SendQueueError(err.into()))?
+                    //         .is_some()
+                    //     {
+                    //         trace!("adding a reaction to a local echo");
+                    //         return Ok(true);
+                    //     }
 
-                        warn!("couldn't toggle reaction for local echo");
-                        return Ok(false);
-                    }
+                    //     warn!("couldn't toggle reaction for local echo");
+                    //     return Ok(false);
+                    // }
 
                     warn!("missing send handle for local echo; is this a test?");
                     return Ok(false);
@@ -539,31 +540,31 @@ impl<P: RoomDataProvider> TimelineController<P> {
 
         trace!("removing a previous reaction");
         match prev_status {
-            ReactionStatus::LocalToLocal(send_reaction_handle) => {
-                if let Some(handle) = send_reaction_handle {
-                    if !handle.abort().await.map_err(|err| Error::SendQueueError(err.into()))? {
-                        // Impossible state: the reaction has moved from local to echo under our
-                        // feet, but the timeline was supposed to be locked!
-                        warn!("unexpectedly unable to abort sending of local reaction");
-                    }
-                } else {
+            ReactionStatus::LocalToLocal() => {
+                // if let Some(handle) = send_reaction_handle {
+                //     if !handle.abort().await.map_err(|err| Error::SendQueueError(err.into()))? {
+                //         // Impossible state: the reaction has moved from local to echo under our
+                //         // feet, but the timeline was supposed to be locked!
+                //         warn!("unexpectedly unable to abort sending of local reaction");
+                //     }
+                // } else {
                     warn!("no send reaction handle (this should only happen in testing contexts)");
-                }
+                // }
             }
 
-            ReactionStatus::LocalToRemote(send_handle) => {
+            ReactionStatus::LocalToRemote() => {
                 // No need to reflect the change ourselves, since handling the discard of the
                 // local echo will take care of it.
                 trace!("aborting send of the previous reaction that was a local echo");
-                if let Some(handle) = send_handle {
-                    if !handle.abort().await.map_err(|err| Error::SendQueueError(err.into()))? {
-                        // Impossible state: the reaction has moved from local to echo under our
-                        // feet, but the timeline was supposed to be locked!
-                        warn!("unexpectedly unable to abort sending of local reaction");
-                    }
-                } else {
+                // if let Some(handle) = send_handle {
+                //     if !handle.abort().await.map_err(|err| Error::SendQueueError(err.into()))? {
+                //         // Impossible state: the reaction has moved from local to echo under our
+                //         // feet, but the timeline was supposed to be locked!
+                //         warn!("unexpectedly unable to abort sending of local reaction");
+                //     }
+                // } else {
                     warn!("no send handle (this should only happen in testing contexts)");
-                }
+                // }
             }
 
             ReactionStatus::RemoteToRemote(event_id) => {
@@ -833,17 +834,17 @@ impl<P: RoomDataProvider> TimelineController<P> {
             let reactions = item.reactions();
             for (_key, by_user) in reactions.iter() {
                 for (_user_id, info) in by_user.iter() {
-                    if let ReactionStatus::LocalToLocal(Some(reaction_handle)) = &info.status {
-                        let reaction_txn_id = reaction_handle.transaction_id().to_owned();
-                        if let Some(found) = txn
-                            .meta
-                            .reactions
-                            .map
-                            .get_mut(&TimelineEventItemId::TransactionId(reaction_txn_id))
-                        {
-                            found.item = TimelineEventItemId::EventId(new_event_id.to_owned());
-                        }
-                    }
+                    // if let ReactionStatus::LocalToLocal(Some(reaction_handle)) = &info.status {
+                    //     let reaction_txn_id = reaction_handle.transaction_id().to_owned();
+                    //     if let Some(found) = txn
+                    //         .meta
+                    //         .reactions
+                    //         .map
+                    //         .get_mut(&TimelineEventItemId::TransactionId(reaction_txn_id))
+                    //     {
+                    //         found.item = TimelineEventItemId::EventId(new_event_id.to_owned());
+                    //     }
+                    // }
                 }
             }
         }
@@ -1300,7 +1301,7 @@ impl<P: RoomDataProvider> TimelineController<P> {
         let reaction_txn_id = send_handle.transaction_id().to_owned();
         let reaction_info = ReactionInfo {
             timestamp: MilliSecondsSinceUnixEpoch::now(),
-            status: ReactionStatus::LocalToLocal(Some(send_handle)),
+            status: ReactionStatus::LocalToLocal(),
         };
 
         let mut reactions = item.reactions().clone();

@@ -15,9 +15,6 @@
 #![doc = include_str!("../README.md")]
 #![warn(missing_debug_implementations)]
 
-use std::pin::Pin;
-
-use futures_core::Future;
 #[doc(no_inline)]
 pub use ruma;
 
@@ -44,6 +41,9 @@ pub use store_locks::LEASE_DURATION_MS;
 pub trait SendOutsideWasm: Send {}
 #[cfg(not(target_arch = "wasm32"))]
 impl<T: Send> SendOutsideWasm for T {}
+
+
+pub type BackendError = Box<dyn std::error::Error + Send + Sync>;
 
 /// Alias for `Send` on non-wasm, empty trait (implemented by everything) on
 /// wasm.
@@ -89,12 +89,6 @@ macro_rules! boxed_into_future {
         >>;
     };
 }
-
-/// A `Box::pin` future that is `Send` on non-wasm, and without `Send` on wasm.
-#[cfg(target_arch = "wasm32")]
-pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + 'a>>;
-#[cfg(not(target_arch = "wasm32"))]
-pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + Send + 'a>>;
 
 #[cfg(feature = "uniffi")]
 uniffi::setup_scaffolding!();

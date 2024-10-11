@@ -126,7 +126,8 @@ impl From<&str> for TimelineEventItemId {
 /// returned, if available.
 pub(crate) enum TimelineItemHandle<'a> {
     Remote(&'a EventId),
-    Local(&'a SendHandle),
+    // TODO(daniel): removed temporarily
+    Local(),
 }
 
 impl EventTimelineItem {
@@ -569,8 +570,8 @@ impl EventTimelineItem {
                     TimelineItemHandle::Remote(event_id)
                 } else {
                     TimelineItemHandle::Local(
-                        // The send_handle must always be present, except in tests.
-                        local.send_handle.as_ref().expect("Unexpected missing send_handle"),
+                    //     // The send_handle must always be present, except in tests.
+                    //     local.send_handle.as_ref().expect("Unexpected missing send_handle"),
                     )
                 }
             }
@@ -662,11 +663,11 @@ pub enum ReactionStatus {
     /// It's a local reaction to a local echo.
     ///
     /// The handle is missing only in testing contexts.
-    LocalToLocal(Option<SendReactionHandle>),
+    LocalToLocal(),
     /// It's a local reaction to a remote event.
     ///
     /// The handle is missing only in testing contexts.
-    LocalToRemote(Option<SendHandle>),
+    LocalToRemote(),
     /// It's a remote reaction to a remote event.
     RemoteToRemote(OwnedEventId),
 }

@@ -42,9 +42,6 @@ pub trait SendOutsideWasm: Send {}
 #[cfg(not(target_arch = "wasm32"))]
 impl<T: Send> SendOutsideWasm for T {}
 
-
-pub type BackendError = Box<dyn std::error::Error + Send + Sync>;
-
 /// Alias for `Send` on non-wasm, empty trait (implemented by everything) on
 /// wasm.
 #[cfg(target_arch = "wasm32")]

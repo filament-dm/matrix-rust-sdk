@@ -189,9 +189,8 @@ use mas_oidc_client::{
     },
 };
 use matrix_sdk_base::{
-    crypto::types::qr_login::QrCodeData, once_cell::sync::OnceCell, SessionMeta
+    crypto::types::qr_login::QrCodeData, once_cell::sync::OnceCell, SessionMeta,
 };
-use matrix_sdk_common::BackendError;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use ruma::api::client::discovery::get_authentication_issuer;
 use serde::{Deserialize, Serialize};
@@ -1712,7 +1711,7 @@ pub enum OidcError {
 
     /// An unknown error occurred.
     #[error("unknown error")]
-    UnknownError(#[source] BackendError),
+    UnknownError(#[source] Box<dyn std::error::Error + Send + Sync>),
 }
 
 impl<E> From<E> for OidcError

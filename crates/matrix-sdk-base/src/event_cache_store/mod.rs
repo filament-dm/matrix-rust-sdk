@@ -28,7 +28,6 @@ mod memory_store;
 mod traits;
 
 pub use matrix_sdk_store_encryption::Error as StoreEncryptionError;
-use matrix_sdk_common::BackendError;
 
 #[cfg(any(test, feature = "testing"))]
 pub use self::integration_tests::EventCacheStoreIntegrationTests;
@@ -43,7 +42,7 @@ pub use self::{
 pub enum EventCacheStoreError {
     /// An error happened in the underlying database backend.
     #[error(transparent)]
-    Backend(BackendError),
+    Backend(Box<dyn std::error::Error + Send + Sync>),
 
     /// The store is locked with a passphrase and an incorrect passphrase
     /// was given.

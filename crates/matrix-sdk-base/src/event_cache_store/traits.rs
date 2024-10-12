@@ -15,7 +15,6 @@
 use std::{fmt, sync::Arc};
 
 use async_trait::async_trait;
-use matrix_sdk_common::AsyncTraitDeps;
 use ruma::MxcUri;
 
 use super::EventCacheStoreError;

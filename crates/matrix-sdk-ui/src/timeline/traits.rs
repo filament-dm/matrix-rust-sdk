@@ -15,7 +15,6 @@
 use std::future::Future;
 
 use eyeball::Subscriber;
-use futures_util::FutureExt as _;
 use indexmap::IndexMap;
 #[cfg(test)]
 use matrix_sdk::crypto::{DecryptionSettings, TrustRequirement};

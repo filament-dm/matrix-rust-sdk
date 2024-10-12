@@ -23,7 +23,6 @@ use std::{
 use as_variant::as_variant;
 use async_trait::async_trait;
 use growable_bloom_filter::GrowableBloom;
-use matrix_sdk_common::AsyncTraitDeps;
 use ruma::{
     api::MatrixVersion,
     events::{

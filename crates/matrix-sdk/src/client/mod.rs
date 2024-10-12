@@ -33,7 +33,7 @@ use matrix_sdk_base::{
     store::{DynStateStore, ServerCapabilities},
     sync::{Notification, RoomUpdates},
     BaseClient, RoomInfoNotableUpdate, RoomState, RoomStateFilter, SendOutsideWasm, SessionMeta,
-    StateStoreDataKey, StateStoreDataValue, SyncOutsideWasm,
+    StateStoreDataKey, StateStoreDataValue,
 };
 #[cfg(feature = "e2e-encryption")]
 use ruma::events::{room::encryption::RoomEncryptionEventContent, InitialStateEvent};

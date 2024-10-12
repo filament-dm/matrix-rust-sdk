@@ -15,7 +15,6 @@
 use std::{collections::HashMap, fmt, sync::Arc};
 
 use async_trait::async_trait;
-use matrix_sdk_common::AsyncTraitDeps;
 use ruma::{
     events::secret::request::SecretName, DeviceId, OwnedDeviceId, RoomId, TransactionId, UserId,
 };

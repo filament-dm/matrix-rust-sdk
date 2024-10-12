@@ -504,21 +504,20 @@ impl<P: RoomDataProvider> TimelineController<P> {
         let Some(prev_status) = prev_status else {
             match &item.inner.kind {
                 EventTimelineItemKind::Local(local) => {
-                    // TODO(daniel): removed temporarily
-                    // if let Some(send_handle) = local.send_handle.clone() {
-                    //     if send_handle
-                    //         .react(key.to_owned())
-                    //         .await
-                    //         .map_err(|err| Error::SendQueueError(err.into()))?
-                    //         .is_some()
-                    //     {
-                    //         trace!("adding a reaction to a local echo");
-                    //         return Ok(true);
-                    //     }
+                    if let Some(send_handle) = local.send_handle.clone() {
+                        if send_handle
+                            .react(key.to_owned())
+                            .await
+                            .map_err(|err| Error::SendQueueError(err.into()))?
+                            .is_some()
+                        {
+                            trace!("adding a reaction to a local echo");
+                            return Ok(true);
+                        }
 
-                    //     warn!("couldn't toggle reaction for local echo");
-                    //     return Ok(false);
-                    // }
+                        warn!("couldn't toggle reaction for local echo");
+                        return Ok(false);
+                    }
 
                     warn!("missing send handle for local echo; is this a test?");
                     return Ok(false);

@@ -126,8 +126,7 @@ impl From<&str> for TimelineEventItemId {
 /// returned, if available.
 pub(crate) enum TimelineItemHandle<'a> {
     Remote(&'a EventId),
-    // TODO(daniel): removed temporarily
-    Local(),
+    Local(&'a SendHandle),
 }
 
 impl EventTimelineItem {
@@ -570,8 +569,8 @@ impl EventTimelineItem {
                     TimelineItemHandle::Remote(event_id)
                 } else {
                     TimelineItemHandle::Local(
-                    //     // The send_handle must always be present, except in tests.
-                    //     local.send_handle.as_ref().expect("Unexpected missing send_handle"),
+                        // The send_handle must always be present, except in tests.
+                        local.send_handle.as_ref().expect("Unexpected missing send_handle"),
                     )
                 }
             }

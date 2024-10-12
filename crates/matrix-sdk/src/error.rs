@@ -27,7 +27,6 @@ use matrix_sdk_base::crypto::{
 use matrix_sdk_base::{
     event_cache_store::EventCacheStoreError, Error as SdkBaseError, RoomState, StoreError,
 };
-use matrix_sdk_common::BackendError;
 use reqwest::Error as ReqwestError;
 use ruma::{
     api::{
@@ -371,7 +370,7 @@ pub enum Error {
     /// This might happen because encryption was enabled on the base-crate
     /// but not here and that raised.
     #[error("unknown error: {0}")]
-    UnknownError(BackendError),
+    UnknownError(Box<dyn std::error::Error + Send + Sync>),
 
     /// An error coming from the event cache subsystem.
     #[error(transparent)]

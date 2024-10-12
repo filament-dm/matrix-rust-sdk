@@ -36,7 +36,6 @@ pub use self::{
     traits::{DynEventCacheStore, EventCacheStore, IntoEventCacheStore},
 };
 
-
 /// Event cache store specific error type.
 #[derive(Debug, thiserror::Error)]
 pub enum EventCacheStoreError {

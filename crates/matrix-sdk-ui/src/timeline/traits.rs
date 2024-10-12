@@ -19,7 +19,10 @@ use indexmap::IndexMap;
 #[cfg(test)]
 use matrix_sdk::crypto::{DecryptionSettings, TrustRequirement};
 use matrix_sdk::{
-    deserialized_responses::TimelineEvent, event_cache::paginator::PaginableRoom, executor::{BoxFuture, BoxFutureExt as _}, AsyncTraitDeps, Result, Room
+    deserialized_responses::TimelineEvent, 
+    event_cache::paginator::PaginableRoom, 
+    executor::{BoxFuture, BoxFutureExt as _}, 
+    AsyncTraitDeps, Result, Room
 };
 use matrix_sdk_base::{latest_event::LatestEvent, RoomInfo};
 use ruma::{

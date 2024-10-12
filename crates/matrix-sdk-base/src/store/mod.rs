@@ -58,7 +58,9 @@ use tokio::sync::{broadcast, Mutex, RwLock};
 use tracing::warn;
 
 use crate::{
-    event_cache_store::{DynEventCacheStore, IntoEventCacheStore}, rooms::{normal::RoomInfoNotableUpdate, RoomInfo, RoomState}, MinimalRoomMemberEvent, Room, RoomStateFilter, SessionMeta
+    event_cache_store::{DynEventCacheStore, IntoEventCacheStore}, 
+    rooms::{normal::RoomInfoNotableUpdate, RoomInfo, RoomState}, 
+    MinimalRoomMemberEvent, Room, RoomStateFilter, SessionMeta
 };
 
 pub(crate) mod ambiguity_map;

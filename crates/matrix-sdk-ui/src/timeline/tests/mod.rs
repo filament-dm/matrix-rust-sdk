@@ -26,7 +26,13 @@ use futures_core::Stream;
 use futures_util::FutureExt as _;
 use indexmap::IndexMap;
 use matrix_sdk::{
-    config::RequestConfig, deserialized_responses::{SyncTimelineEvent, TimelineEvent}, event_cache::paginator::{PaginableRoom, PaginatorError}, executor::{BoxFuture, BoxFutureExt}, room::{EventWithContextResponse, Messages, MessagesOptions}, send_queue::RoomSendQueueUpdate, test_utils::events::EventFactory
+    config::RequestConfig,
+    deserialized_responses::{SyncTimelineEvent, TimelineEvent}, 
+    event_cache::paginator::{PaginableRoom, PaginatorError}, 
+    executor::{BoxFuture, BoxFutureExt}, 
+    room::{EventWithContextResponse, Messages, MessagesOptions}, 
+    send_queue::RoomSendQueueUpdate, 
+    test_utils::events::EventFactory,
 };
 use matrix_sdk_base::{latest_event::LatestEvent, RoomInfo, RoomState};
 use matrix_sdk_test::{EventBuilder, ALICE, BOB, DEFAULT_TEST_ROOM_ID};

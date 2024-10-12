@@ -333,7 +333,7 @@ async fn test_local_reaction_to_local_echo() {
         let reactions = item.as_event().unwrap().reactions();
         assert_eq!(reactions.len(), 1);
         let reaction_info = reactions.get(key1).unwrap().get(user_id).unwrap();
-        assert_matches!(&reaction_info.status, ReactionStatus::LocalToLocal());
+        assert_matches!(&reaction_info.status, ReactionStatus::LocalToLocal(..));
     });
 
     // Add another reaction.
@@ -345,7 +345,7 @@ async fn test_local_reaction_to_local_echo() {
         let reactions = item.as_event().unwrap().reactions();
         assert_eq!(reactions.len(), 2);
         let reaction_info = reactions.get(key2).unwrap().get(user_id).unwrap();
-        assert_matches!(&reaction_info.status, ReactionStatus::LocalToLocal());
+        assert_matches!(&reaction_info.status, ReactionStatus::LocalToLocal(..));
     });
 
     // Remove second reaction. It's immediately removed, since it was a local echo,
@@ -356,7 +356,7 @@ async fn test_local_reaction_to_local_echo() {
         let reactions = item.as_event().unwrap().reactions();
         assert_eq!(reactions.len(), 1);
         let reaction_info = reactions.get(key1).unwrap().get(user_id).unwrap();
-        assert_matches!(&reaction_info.status, ReactionStatus::LocalToLocal());
+        assert_matches!(&reaction_info.status, ReactionStatus::LocalToLocal(..));
     });
 
     // Now, wait for the remote echo for the message itself.
@@ -365,7 +365,7 @@ async fn test_local_reaction_to_local_echo() {
         assert_eq!(reactions.len(), 1);
         let reaction_info = reactions.get(key1).unwrap().get(user_id).unwrap();
         // TODO(bnjbvr): why not LocalToRemote here?
-        assert_matches!(&reaction_info.status, ReactionStatus::LocalToLocal());
+        assert_matches!(&reaction_info.status, ReactionStatus::LocalToLocal(..));
     });
 
     // And then the remote echo for the reaction itself.

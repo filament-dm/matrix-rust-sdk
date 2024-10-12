@@ -112,7 +112,7 @@ async fn test_abort_before_being_sent() {
         assert_eq!(reactions.len(), 1);
         assert_matches!(
             &reactions.get("👍").unwrap().get(user_id).unwrap().status,
-            ReactionStatus::LocalToRemote()
+            ReactionStatus::LocalToRemote(_)
         );
 
         assert!(stream.next().now_or_never().is_none());
@@ -128,11 +128,11 @@ async fn test_abort_before_being_sent() {
         assert_eq!(reactions.len(), 2);
         assert_matches!(
             &reactions.get("👍").unwrap().get(user_id).unwrap().status,
-            ReactionStatus::LocalToRemote()
+            ReactionStatus::LocalToRemote(_)
         );
         assert_matches!(
             &reactions.get("🥰").unwrap().get(user_id).unwrap().status,
-            ReactionStatus::LocalToRemote()
+            ReactionStatus::LocalToRemote(_)
         );
 
         assert!(stream.next().now_or_never().is_none());
@@ -149,7 +149,7 @@ async fn test_abort_before_being_sent() {
         assert_eq!(reactions.len(), 1);
         assert_matches!(
             &reactions.get("🥰").unwrap().get(user_id).unwrap().status,
-            ReactionStatus::LocalToRemote()
+            ReactionStatus::LocalToRemote(_)
         );
 
         assert!(stream.next().now_or_never().is_none());

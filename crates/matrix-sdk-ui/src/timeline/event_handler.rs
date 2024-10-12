@@ -684,7 +684,7 @@ impl<'a, 'o> TimelineEventHandler<'a, 'o> {
                     timestamp: self.ctx.timestamp,
                     status: match &reaction_id {
                         TimelineEventItemId::TransactionId(_txn_id) => {
-                            ReactionStatus::LocalToRemote()
+                            ReactionStatus::LocalToRemote(send_handle)
                         }
                         TimelineEventItemId::EventId(event_id) => {
                             ReactionStatus::RemoteToRemote(event_id.clone())

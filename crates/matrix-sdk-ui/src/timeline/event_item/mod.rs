@@ -662,11 +662,11 @@ pub enum ReactionStatus {
     /// It's a local reaction to a local echo.
     ///
     /// The handle is missing only in testing contexts.
-    LocalToLocal(),
+    LocalToLocal(Option<SendReactionHandle>),
     /// It's a local reaction to a remote event.
     ///
     /// The handle is missing only in testing contexts.
-    LocalToRemote(),
+    LocalToRemote(Option<SendHandle>),
     /// It's a remote reaction to a remote event.
     RemoteToRemote(OwnedEventId),
 }

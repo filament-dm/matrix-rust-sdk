@@ -15,7 +15,6 @@
 use std::{fmt, sync::Arc};
 
 use async_trait::async_trait;
-use matrix_sdk_common::AsyncTraitDeps;
 use ruma::MxcUri;
 
 use super::EventCacheStoreError;
@@ -25,7 +24,7 @@ use crate::media::MediaRequest;
 /// for the event cache of the SDK.
 #[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
 #[cfg_attr(not(target_arch = "wasm32"), async_trait)]
-pub trait EventCacheStore: AsyncTraitDeps {
+pub trait EventCacheStore: Send + Sync {
     /// The error type used by this event cache store.
     type Error: fmt::Debug + Into<EventCacheStoreError>;
 

@@ -136,6 +136,9 @@ mod impl_non_wasm32 {
 #[cfg(target_arch = "wasm32")]
 mod impl_wasm32 {
     use std::{borrow::Borrow, collections::BTreeMap, hash::Hash};
+    use futures_util::stream;
+    use futures_util::{Stream, StreamExt};
+    use eyeball_im::{Vector, VectorDiff};
 
     /// An observable map for Wasm. It's a simple wrapper around `BTreeMap`.
     #[derive(Debug)]
@@ -183,6 +186,13 @@ mod impl_wasm32 {
         /// Return an iterator over the existing values.
         pub(crate) fn iter(&self) -> impl Iterator<Item = &V> {
             self.0.values()
+        }
+
+        /// Get a [`Stream`] of the values.
+        pub(crate) fn stream(&self) -> (Vector<V>, impl Stream<Item = Vec<VectorDiff<V>>>) {
+            let values: Vector<V> = self.0.values().cloned().collect();
+            let stream = stream::iter(vec![values.clone()]).map(|v| vec![VectorDiff::Reset{ values: v }]);
+            (values, stream)
         }
     }
 }

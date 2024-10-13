@@ -123,6 +123,9 @@ opt-level = 3
 [patch.crates-io]
 async-compat = { git = "https://github.com/jplatte/async-compat", rev = "16dc8597ec09a6102d58d4e7b67714a35dd0ecb8" }
 const_panic = { git = "https://github.com/jplatte/const_panic", rev = "9024a4cb3eac45c1d2d980f17aaee287b17be498" }
+eyeball = { git = "https://github.com/vimeiro-co/eyeball", rev = "1fe5df1d884db97dda030837caf2e79001f0ac93" }
+eyeball-im = { git = "https://github.com/vimeiro-co/eyeball", rev = "1fe5df1d884db97dda030837caf2e79001f0ac93" }
+eyeball-im-util = { git = "https://github.com/vimeiro-co/eyeball", rev = "1fe5df1d884db97dda030837caf2e79001f0ac93" }
 # Needed to fix rotation log issue on Android (https://github.com/tokio-rs/tracing/issues/2937)
 tracing = { git = "https://github.com/element-hq/tracing.git", rev = "ca9431f74d37c9d3b5e6a9f35b2c706711dab7dd" }
 tracing-core = { git = "https://github.com/element-hq/tracing.git", rev = "ca9431f74d37c9d3b5e6a9f35b2c706711dab7dd" }

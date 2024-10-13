@@ -1732,7 +1732,7 @@ dependencies = [
 [[package]]
 name = "eyeball"
 version = "0.8.8"
-source = "git+https://github.com/vimeiro-co/eyeball?rev=1fe5df1d884db97dda030837caf2e79001f0ac93#1fe5df1d884db97dda030837caf2e79001f0ac93"
+source = "git+https://github.com/vimeiro-co/eyeball?rev=e218ce8f9b2f5cba5c8754c5d3e243482d8b71de#e218ce8f9b2f5cba5c8754c5d3e243482d8b71de"
 dependencies = [
  "futures-core",
  "readlock",
@@ -1742,19 +1742,18 @@ dependencies = [
 [[package]]
 name = "eyeball-im"
 version = "0.5.0"
-source = "git+https://github.com/vimeiro-co/eyeball?rev=1fe5df1d884db97dda030837caf2e79001f0ac93#1fe5df1d884db97dda030837caf2e79001f0ac93"
+source = "git+https://github.com/vimeiro-co/eyeball?rev=e218ce8f9b2f5cba5c8754c5d3e243482d8b71de#e218ce8f9b2f5cba5c8754c5d3e243482d8b71de"
 dependencies = [
  "futures-core",
  "imbl",
  "tokio",
- "tokio-util",
  "tracing",
 ]
 
 [[package]]
 name = "eyeball-im-util"
 version = "0.6.0"
-source = "git+https://github.com/vimeiro-co/eyeball?rev=1fe5df1d884db97dda030837caf2e79001f0ac93#1fe5df1d884db97dda030837caf2e79001f0ac93"
+source = "git+https://github.com/vimeiro-co/eyeball?rev=e218ce8f9b2f5cba5c8754c5d3e243482d8b71de#e218ce8f9b2f5cba5c8754c5d3e243482d8b71de"
 dependencies = [
  "arrayvec",
  "eyeball-im",

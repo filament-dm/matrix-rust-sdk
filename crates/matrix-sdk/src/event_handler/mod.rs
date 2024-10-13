@@ -39,7 +39,8 @@ use std::{
     future::Future,
     pin::Pin,
     sync::{
-        atomic::{AtomicU64, Ordering::SeqCst}, RwLock
+        atomic::{AtomicU64, Ordering::SeqCst},
+        RwLock,
     },
 };
 

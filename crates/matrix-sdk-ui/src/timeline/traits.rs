@@ -19,10 +19,10 @@ use indexmap::IndexMap;
 #[cfg(test)]
 use matrix_sdk::crypto::{DecryptionSettings, TrustRequirement};
 use matrix_sdk::{
-    deserialized_responses::TimelineEvent, 
-    event_cache::paginator::PaginableRoom, 
-    executor::{BoxFuture, BoxFutureExt as _}, 
-    AsyncTraitDeps, Result, Room
+    deserialized_responses::TimelineEvent,
+    event_cache::paginator::PaginableRoom,
+    executor::{BoxFuture, BoxFutureExt as _},
+    Result, Room, SendOutsideWasm, SyncOutsideWasm,
 };
 use matrix_sdk_base::{latest_event::LatestEvent, RoomInfo};
 use ruma::{
@@ -49,8 +49,8 @@ pub trait RoomExt {
     ///
     /// This is the same as using `room.timeline_builder().build()`.
     #[cfg(not(target_arch = "wasm32"))]
-    fn timeline(&self) -> impl  Future<Output = Result<Timeline, timeline::Error>> + Send;
-    
+    fn timeline(&self) -> impl Future<Output = Result<Timeline, timeline::Error>> + Send;
+
     /// Get a [`Timeline`] for this room.
     ///
     /// This offers a higher-level API than event handlers, in treating things
@@ -59,7 +59,7 @@ pub trait RoomExt {
     ///
     /// This is the same as using `room.timeline_builder().build()`.
     #[cfg(target_arch = "wasm32")]
-    fn timeline(&self) -> impl  Future<Output = Result<Timeline, timeline::Error>>;
+    fn timeline(&self) -> impl Future<Output = Result<Timeline, timeline::Error>>;
 
     /// Get a [`TimelineBuilder`] for this room.
     ///
@@ -82,7 +82,8 @@ impl RoomExt for Room {
     }
 }
 
-pub(super) trait RoomDataProvider: AsyncTraitDeps + Clone + 'static + PaginableRoom + PinnedEventsRoom
+pub(super) trait RoomDataProvider:
+    Clone + SendOutsideWasm + SyncOutsideWasm + 'static + PaginableRoom + PinnedEventsRoom
 {
     fn own_user_id(&self) -> &UserId;
     fn room_version(&self) -> RoomVersionId;
@@ -294,8 +295,7 @@ impl RoomDataProvider for Room {
 
 // Internal helper to make most of retry_event_decryption independent of a room
 // object, which is annoying to create for testing and not really needed
-pub(super) trait Decryptor: Clone + AsyncTraitDeps + 'static {
-
+pub(super) trait Decryptor: Clone + SendOutsideWasm + SyncOutsideWasm + 'static {
     #[cfg(not(target_arch = "wasm32"))]
     fn decrypt_event_impl(
         &self,

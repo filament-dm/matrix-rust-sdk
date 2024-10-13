@@ -35,10 +35,9 @@ use async_stream::stream;
 pub use client::{Version, VersionBuilder};
 use futures_core::stream::Stream;
 pub use matrix_sdk_base::sliding_sync::http;
-use matrix_sdk_common::{executor::spawn, timer};
 #[cfg(feature = "e2e-encryption")]
 use matrix_sdk_common::executor::JoinHandleExt as _;
-
+use matrix_sdk_common::{executor::spawn, timer};
 use ruma::{
     api::{client::error::ErrorKind, OutgoingRequest},
     assign, OwnedEventId, OwnedRoomId, RoomId,

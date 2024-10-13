@@ -23,15 +23,14 @@ use std::{
 use eyeball::{SharedObservable, Subscriber};
 use eyeball_im::VectorDiff;
 use futures_core::Stream;
-use futures_util::FutureExt as _;
 use indexmap::IndexMap;
 use matrix_sdk::{
     config::RequestConfig,
-    deserialized_responses::{SyncTimelineEvent, TimelineEvent}, 
-    event_cache::paginator::{PaginableRoom, PaginatorError}, 
-    executor::{BoxFuture, BoxFutureExt}, 
-    room::{EventWithContextResponse, Messages, MessagesOptions}, 
-    send_queue::RoomSendQueueUpdate, 
+    deserialized_responses::{SyncTimelineEvent, TimelineEvent},
+    event_cache::paginator::{PaginableRoom, PaginatorError},
+    executor::{BoxFuture, BoxFutureExt},
+    room::{EventWithContextResponse, Messages, MessagesOptions},
+    send_queue::RoomSendQueueUpdate,
     test_utils::events::EventFactory,
 };
 use matrix_sdk_base::{latest_event::LatestEvent, RoomInfo, RoomState};

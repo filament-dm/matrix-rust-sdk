@@ -6,7 +6,7 @@ use std::{
     time::Duration,
 };
 
-use anyhow::{anyhow, Context as _};
+use anyhow::{anyhow, Context};
 use futures_util::pin_mut;
 use matrix_sdk::{
     authentication::oauth::{
@@ -884,7 +884,7 @@ impl Client {
             .account()
             .set_display_name(Some(name.as_str()))
             .await
-            .context("Unable to set display name")?;
+            .map_err(|e| anyhow!("Unable to set display name: {}", e))?;
         Ok(())
     }
 

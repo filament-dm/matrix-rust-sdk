@@ -1,13 +1,13 @@
 use std::{collections::HashMap, error::Error, fmt, fmt::Display, time::SystemTime};
 
 use matrix_sdk::{
-    authentication::oauth::OAuthError, encryption::CryptoStoreError, event_cache::EventCacheError,
+    authentication::oauth::OAuthError, encryption::{CryptoStoreError, identities::RequestVerificationError}, event_cache::EventCacheError,
     reqwest, room::edit::EditError, send_queue::RoomSendQueueError, HttpError, IdParseError,
     NotificationSettingsError as SdkNotificationSettingsError,
     QueueWedgeError as SdkQueueWedgeError, StoreError,
 };
 use matrix_sdk_ui::{encryption_sync_service, notification_client, sync_service, timeline};
-use ruma::api::client::error::{ErrorBody, ErrorKind as RumaApiErrorKind, RetryAfter};
+use ruma::{api::client::error::{ErrorBody, ErrorKind as RumaApiErrorKind, RetryAfter}, MilliSecondsSinceUnixEpoch};
 use tracing::warn;
 use uniffi::UnexpectedUniFFICallbackError;
 
@@ -194,6 +194,12 @@ impl From<NotYetImplemented> for ClientError {
 
 impl From<FocusEventError> for ClientError {
     fn from(e: FocusEventError) -> Self {
+        Self::from_err(e)
+    }
+}
+
+impl From<RequestVerificationError> for ClientError {
+    fn from(e: RequestVerificationError) -> Self {
         Self::from_err(e)
     }
 }
@@ -749,7 +755,10 @@ impl TryFrom<RumaApiErrorKind> for ErrorKind {
                 let retry_after_ms = match retry_after {
                     Some(RetryAfter::Delay(duration)) => Some(duration.as_millis() as u64),
                     Some(RetryAfter::DateTime(system_time)) => {
-                        let duration = system_time.duration_since(SystemTime::now()).ok();
+                      let duration = MilliSecondsSinceUnixEpoch::now()
+                            .to_system_time()
+                            .map(|now| system_time.duration_since(now).ok())
+                            .flatten();
                         duration.map(|duration| duration.as_millis() as u64)
                     }
                     None => None,

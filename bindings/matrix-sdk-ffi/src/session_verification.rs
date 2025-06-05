@@ -117,8 +117,7 @@ impl SessionVerificationController {
         let verification_request = self
             .user_identity
             .request_verification_with_methods(methods)
-            .await
-            .map_err(anyhow::Error::from)?;
+            .await?;
 
         self.set_ongoing_verification_request(verification_request)
     }
@@ -141,8 +140,7 @@ impl SessionVerificationController {
 
         let verification_request = user_identity
             .request_verification_with_methods(methods)
-            .await
-            .map_err(anyhow::Error::from)?;
+            .await?;
 
         self.set_ongoing_verification_request(verification_request)
     }

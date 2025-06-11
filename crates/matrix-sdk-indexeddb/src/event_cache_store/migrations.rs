@@ -22,6 +22,10 @@ use web_sys::{DomException, IdbIndexParameters};
 
 const CURRENT_DB_VERSION: Version = Version::V1;
 
+pub mod keys {
+    pub use super::v1::keys::*;
+}
+
 /// Opens a connection to the IndexedDB database and takes care of upgrading it
 /// if necessary.
 #[allow(unused)]
@@ -103,6 +107,7 @@ pub mod v1 {
 
     pub mod keys {
         pub const CORE: &str = "core";
+        pub const ROOMS: &str = "rooms";
         pub const LINKED_CHUNKS: &str = "linked_chunks";
         pub const LINKED_CHUNKS_KEY_PATH: &str = "id";
         pub const LINKED_CHUNKS_NEXT: &str = "linked_chunks_next";
@@ -113,6 +118,8 @@ pub mod v1 {
         pub const EVENTS_POSITION_KEY_PATH: &str = "position";
         pub const EVENTS_RELATION: &str = "events_relation";
         pub const EVENTS_RELATION_KEY_PATH: &str = "relation";
+        pub const EVENTS_RELATION_RELATED_EVENTS: &str = "events_relation_related_event";
+        pub const EVENTS_RELATION_RELATION_TYPES: &str = "events_relation_relation_type";
         pub const GAPS: &str = "gaps";
         pub const GAPS_KEY_PATH: &str = "id";
     }

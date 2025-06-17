@@ -31,6 +31,18 @@ use serde::{Deserialize, Serialize};
 
 use crate::serializer::MaybeEncrypted;
 
+/// A type that wraps a (de)serialized value `value` and associates it
+/// with an identifier, `id`.
+///
+/// This is useful for (de)serializing values to/from an object store
+/// and ensuring that they are well-formed, as each of the object stores
+/// uses `id` as its key path.
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ValueWithId {
+    pub id: String,
+    pub value: MaybeEncrypted,
+}
+
 /// Represents the [`LINKED_CHUNKS`][1] object store.
 ///
 /// [1]: crate::event_cache_store::migrations::v1::create_linked_chunks_object_store
@@ -84,6 +96,12 @@ pub enum IndexedNextChunkIdKey {
     Some(IndexedChunkIdKey),
 }
 
+impl IndexedChunkIdKey {
+    pub fn new(room_id: IndexedRoomId, chunk_id: IndexedChunkId) -> Self {
+        Self(room_id, chunk_id)
+    }
+}
+
 /// Represents the [`EVENTS`][1] object store.
 ///
 /// [1]: crate::event_cache_store::migrations::v1::create_events_object_store
@@ -111,6 +129,12 @@ pub struct IndexedEvent {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IndexedEventIdKey(IndexedRoomId, IndexedEventId);
 
+impl IndexedEventIdKey {
+    pub fn new(room_id: IndexedRoomId, event_id: IndexedEventId) -> Self {
+        Self(room_id, event_id)
+    }
+}
+
 pub type IndexedEventId = String;
 
 /// The value associated with the [`position`](IndexedEvent::position) index of
@@ -124,6 +148,16 @@ pub type IndexedEventId = String;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IndexedEventPositionKey(IndexedRoomId, IndexedChunkId, IndexedEventPositionIndex);
 
+impl IndexedEventPositionKey {
+    pub fn new(
+        room_id: IndexedRoomId,
+        chunk_id: IndexedChunkId,
+        position: IndexedEventPositionIndex,
+    ) -> Self {
+        Self(room_id, chunk_id, position)
+    }
+}
+
 pub type IndexedEventPositionIndex = usize;
 
 /// The value associated with the [`relation`](IndexedEvent::relation) index of
@@ -136,6 +170,16 @@ pub type IndexedEventPositionIndex = usize;
 /// [1]: crate::event_cache_store::migrations::v1::create_events_object_store
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IndexedEventRelationKey(IndexedRoomId, IndexedEventId, IndexedRelationType);
+
+impl IndexedEventRelationKey {
+    pub fn new(
+        room_id: IndexedRoomId,
+        related_event_id: IndexedEventId,
+        relation_type: IndexedRelationType,
+    ) -> Self {
+        Self(room_id, related_event_id, relation_type)
+    }
+}
 
 /// A representation of the relationship between two events (see
 /// [`RelationType`](ruma::events::relation::RelationType))

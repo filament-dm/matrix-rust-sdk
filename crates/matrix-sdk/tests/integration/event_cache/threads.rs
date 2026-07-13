@@ -60,6 +60,70 @@ async fn client_with_threading_support(server: &MatrixMockServer) -> Client {
 }
 
 #[async_test]
+async fn test_empty_thread_first_pagination_does_not_stall_waiting_for_sync_token() {
+    // Repro for the "first thread pagination stalls for 3s" issue.
+    //
+    // `ThreadEventCacheWrapper::wait_for_prev_token` blocks on
+    // `pagination_batch_token_notifier`, and the generic pagination gives that
+    // wait `DEFAULT_WAIT_FOR_TOKEN_DURATION` (3s). The notifier only fires
+    // when a sync stores a prev-batch gap for this specific thread — i.e.
+    // when a limited sync delivers *new* in-thread events. A thread with no
+    // replies (or whose replies aren't in the local cache yet, which is the
+    // common case when opening a thread for the first time) never receives
+    // one, so the first `run_backwards_once` sits out the full 3s before
+    // falling back to the `/relations` request. In a client whose thread view
+    // waits on that first pagination, every first thread open stalls ~3s.
+    let server = MatrixMockServer::new().await;
+    let client = client_with_threading_support(&server).await;
+
+    let room_id = room_id!("!galette:saucisse.bzh");
+
+    let event_cache = client.event_cache();
+    event_cache.subscribe().unwrap();
+
+    // The room is known, but no in-thread event has ever been received via
+    // sync, so the thread cache holds no prev-batch token and never will.
+    let _room = server.sync_room(&client, JoinedRoomBuilder::new(room_id)).await;
+
+    let thread_root_id = event_id!("$thread_root");
+    let (thread_event_cache, _drop_handles) =
+        event_cache.thread(room_id, thread_root_id).await.unwrap();
+
+    // The thread has no replies on the server either.
+    server
+        .mock_room_relations()
+        .match_target_event(thread_root_id.to_owned())
+        .ok(RoomRelationsResponseTemplate::default())
+        .mock_once()
+        .mount()
+        .await;
+
+    let f = EventFactory::new().room(room_id).sender(*ALICE);
+    server
+        .mock_room_event()
+        .match_event_id()
+        .ok(f.text_msg("Thread root").event_id(thread_root_id).into())
+        .mock_once()
+        .mount()
+        .await;
+
+    let start = std::time::Instant::now();
+    let outcome = thread_event_cache.pagination().run_backwards_once(42).await.unwrap();
+    let elapsed = start.elapsed();
+
+    assert!(outcome.reached_start);
+
+    // Both mocked endpoints answer in milliseconds, so the pagination should
+    // complete quickly. On current main this fails at ~3.02s: the whole
+    // DEFAULT_WAIT_FOR_TOKEN_DURATION is spent waiting for a token that can
+    // never arrive.
+    assert!(
+        elapsed < Duration::from_secs(2),
+        "empty-thread first pagination stalled waiting for a sync token: {elapsed:?}"
+    );
+}
+
+#[async_test]
 async fn test_thread_contains_its_root_event() {
     let server = MatrixMockServer::new().await;
     let client = client_with_threading_support(&server).await;

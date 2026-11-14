@@ -1438,6 +1438,11 @@ fn transfer_details(new_item: &mut EventTimelineItem, old_item: &EventTimelineIt
         return;
     };
 
+    if new_msglike.thread_summary.is_none() {
+        new_msglike.thread_summary = old_msglike.thread_summary.clone();
+    }
+
+
     let Some(in_reply_to) = &mut new_msglike.in_reply_to else { return };
     let Some(old_in_reply_to) = &old_msglike.in_reply_to else { return };
 

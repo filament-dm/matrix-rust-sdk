@@ -288,9 +288,12 @@ impl TimelineAction {
                         }
 
                         vec![Self::add_item(TimelineItemContent::MsgLike(
-                            MsgLikeContent::unable_to_decrypt(EncryptedMessage::from_content(
-                                content, utd_cause,
-                            )),
+                            MsgLikeContent {
+                                thread_summary,
+                                ..MsgLikeContent::unable_to_decrypt(EncryptedMessage::from_content(
+                                    content, utd_cause,
+                                ))
+                            },
                         ))]
                     } else {
                         // If we get here, it means that some part of the code has created a

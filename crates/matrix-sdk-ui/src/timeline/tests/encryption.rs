@@ -123,6 +123,13 @@ async fn test_retry_message_decryption() {
         .unwrap();
     let (_, mut stream) = timeline.subscribe_filter_map(Some).await;
 
+    let latest_reply = event_factory
+        .text_msg("Thread reply")
+        .sender(&BOB)
+        .event_id(event_id!("$latest_reply"))
+        .into_raw_sync()
+        .cast_unchecked();
+
     let event = event_factory
         .event(RoomEncryptedEventContent::new(
             EncryptedEventScheme::MegolmV1AesSha2(
@@ -143,7 +150,8 @@ async fn test_retry_message_decryption() {
             ),
             None,
         ))
-        .sender(&BOB);
+        .sender(&BOB)
+        .with_bundled_thread_summary(latest_reply, 1, false);
 
     server
         .mock_sync()
@@ -164,6 +172,7 @@ async fn test_retry_message_decryption() {
         }) = event.content()
     );
     assert_eq!(session_id, SESSION_ID);
+    assert_eq!(event.content().thread_summary().unwrap().num_replies, 1);
 
     assert_next_matches!(stream, VectorDiff::PushFront { value } => {
         assert!(value.is_date_divider());
@@ -198,6 +207,7 @@ async fn test_retry_message_decryption() {
     assert_matches!(event.encryption_info(), Some(_));
     assert_let!(Some(message) = event.content().as_message());
     assert_eq!(message.body(), "It's a secret to everybody");
+    assert_eq!(event.content().thread_summary().unwrap().num_replies, 1);
     assert!(!event.is_highlighted());
 
     // The message should not be re-reported as a late decryption.

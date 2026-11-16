@@ -288,9 +288,12 @@ impl TimelineAction {
                         }
 
                         vec![Self::add_item(TimelineItemContent::MsgLike(
-                            MsgLikeContent::unable_to_decrypt(EncryptedMessage::from_content(
-                                content, utd_cause,
-                            )),
+                            MsgLikeContent {
+                                thread_summary,
+                                ..MsgLikeContent::unable_to_decrypt(EncryptedMessage::from_content(
+                                    content, utd_cause,
+                                ))
+                            },
                         ))]
                     } else {
                         // If we get here, it means that some part of the code has created a
@@ -1434,6 +1437,11 @@ fn transfer_details(new_item: &mut EventTimelineItem, old_item: &EventTimelineIt
     let TimelineItemContent::MsgLike(old_msglike) = &old_item.content else {
         return;
     };
+
+    if new_msglike.thread_summary.is_none() {
+        new_msglike.thread_summary = old_msglike.thread_summary.clone();
+    }
+
 
     let Some(in_reply_to) = &mut new_msglike.in_reply_to else { return };
     let Some(old_in_reply_to) = &old_msglike.in_reply_to else { return };
